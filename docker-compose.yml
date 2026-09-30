@@ -1,0 +1,29 @@
+# 一键启动：docker compose up --build
+# 服务地址 http://localhost:8080 ，API 前缀 /api/v1
+services:
+  allergen-api:
+    build: .
+    image: allergen-traceability:1.0.0
+    container_name: allergen-api
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      # 容器内固定值；如需改宿主端口调整上面的映射即可
+      DB_PATH: /data/allergens.db
+      HOST: 0.0.0.0
+      PORT: "8080"
+      BUSY_TIMEOUT_MS: "10000"
+      SQLITE_SYNC: FULL
+    volumes:
+      # SQLite 数据持久化到命名卷
+      - allergen_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/api/v1/health', timeout=2).status==200 else 1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  allergen_data:

@@ -1,0 +1,5 @@
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30,<1.0
+pydantic>=2.9,<3.0
+# 仅用于 examples 调用脚本与自动化测试（生产镜像不需要）：
+httpx>=0.27,<1.0
